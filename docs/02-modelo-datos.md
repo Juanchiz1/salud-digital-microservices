@@ -4,6 +4,9 @@
 
 ```mermaid
 erDiagram
+    PACIENTE ||--o{ CITA : agenda
+    MEDICO ||--o{ CITA : atiende
+
     PACIENTE {
         uuid id PK
         varchar tipo_documento
@@ -14,6 +17,22 @@ erDiagram
         varchar sexo
         varchar telefono
         varchar email
+        timestamptz creado_en
+    }
+    MEDICO {
+        uuid id PK
+        varchar nombres
+        varchar apellidos
+        varchar especialidad
+        varchar registro_medico
+    }
+    CITA {
+        uuid id PK
+        uuid paciente_id FK
+        uuid medico_id FK
+        timestamptz fecha_hora
+        varchar motivo
+        varchar estado
         timestamptz creado_en
     }
 ```
@@ -32,3 +51,16 @@ Todo cambio al esquema entra como un script `V{n}__descripcion.sql`, de modo
 que local y producción siempre tienen la misma estructura.
 
 **Sexo con códigos H / M / I**, la misma codificación de RIPS.
+
+**Un médico, una cita por horario.** Un índice único parcial sobre
+(medico_id, fecha_hora) ignora las citas canceladas. Cancelar libera el
+horario sin borrar el registro.
+
+**Estados de la cita.** PROGRAMADA → ATENDIDA cuando el médico registra la
+consulta, o PROGRAMADA → CANCELADA. Una cita atendida o cancelada no cambia más.
+
+**Horas en UTC.** `fecha_hora` se guarda como TIMESTAMPTZ y la API la devuelve
+en hora de Colombia (America/Bogota).
+
+**Médicos de demostración.** Se cargan en la migración V2. La administración
+de médicos queda fuera del alcance.
