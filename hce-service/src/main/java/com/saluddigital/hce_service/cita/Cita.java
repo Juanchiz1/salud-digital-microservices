@@ -59,6 +59,13 @@ public class Cita {
         this.estado = EstadoCita.CANCELADA;
     }
 
+    public void atender() {
+        if (estado != EstadoCita.PROGRAMADA) {
+            throw new ConflictoException("Solo se puede atender una cita programada");
+        }
+        this.estado = EstadoCita.ATENDIDA;
+    }
+
     public UUID getId() { return id; }
     public Paciente getPaciente() { return paciente; }
     public Medico getMedico() { return medico; }
@@ -66,4 +73,5 @@ public class Cita {
     public String getMotivo() { return motivo; }
     public EstadoCita getEstado() { return estado; }
     public Instant getCreadoEn() { return creadoEn; }
+    
 }

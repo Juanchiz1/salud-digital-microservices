@@ -35,6 +35,34 @@ erDiagram
         varchar estado
         timestamptz creado_en
     }
+
+        ATENCION {
+        uuid id PK
+        uuid cita_id FK
+        uuid paciente_id FK
+        uuid medico_id FK
+        varchar motivo_consulta
+        varchar notas
+        varchar diagnostico_codigo
+        varchar diagnostico_descripcion
+        timestamptz fecha
+    }
+    ORDEN_EXAMEN {
+        uuid id PK
+        uuid atencion_id FK
+        varchar examen_codigo FK
+        varchar estado
+        timestamptz creada_en
+    }
+    EXAMEN {
+        varchar codigo PK
+        varchar nombre
+    }
+
+        CITA ||--o| ATENCION : genera
+    PACIENTE ||--o{ ATENCION : recibe
+    ATENCION ||--o{ ORDEN_EXAMEN : ordena
+    EXAMEN ||--o{ ORDEN_EXAMEN : "se solicita en"
 ```
 
 ## Decisiones
@@ -64,3 +92,14 @@ en hora de Colombia (America/Bogota).
 
 **Médicos de demostración.** Se cargan en la migración V2. La administración
 de médicos queda fuera del alcance.
+
+**La atención cierra la cita.** Registrar la atención, pasar la cita a
+ATENDIDA y crear las órdenes ocurre en una sola transacción. Si un examen no
+existe, no se guarda nada y la cita sigue PROGRAMADA.
+
+**Codificación estándar.** Diagnósticos en CIE-10 (4 caracteres) y exámenes
+en CUPS. Con códigos estándar, otro sistema entiende la información sin
+traducciones manuales.
+
+**Estados de la orden.** CREADA → ENVIADA (laboratorio la recibió) →
+COMPLETADA (llegó el resultado).
