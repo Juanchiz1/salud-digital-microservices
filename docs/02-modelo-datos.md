@@ -103,3 +103,55 @@ traducciones manuales.
 
 **Estados de la orden.** CREADA → ENVIADA (laboratorio la recibió) →
 COMPLETADA (llegó el resultado).
+
+## lab-service
+
+```mermaid
+erDiagram
+    SOLICITUD ||--o{ RESULTADO_ITEM : contiene
+
+    SOLICITUD {
+        uuid id PK
+        uuid orden_externa_id UK
+        varchar tipo_documento
+        varchar numero_documento
+        varchar paciente_nombre
+        varchar sexo
+        date fecha_nacimiento
+        varchar examen_codigo
+        varchar examen_nombre
+        varchar estado
+        varchar conclusion
+        timestamptz recibida_en
+        timestamptz resultado_en
+    }
+    RESULTADO_ITEM {
+        uuid id PK
+        uuid solicitud_id FK
+        int posicion
+        varchar analito
+        varchar valor
+        varchar unidad
+        varchar rango_referencia
+        varchar interpretacion
+    }
+```
+
+### Decisiones
+
+**Base de datos propia.** Laboratorio no lee las tablas de la HCE ni la HCE las
+de laboratorio. Todo intercambio pasa por la API.
+
+**Solo los datos necesarios.** Laboratorio recibe identificación, sexo y fecha
+de nacimiento (los rangos de referencia dependen de ellos) y el examen pedido.
+No recibe diagnósticos, notas clínicas ni el resto de la historia.
+
+**Recepción idempotente.** `orden_externa_id` es único. Si la misma orden llega
+dos veces, se devuelve la solicitud existente en vez de crear otra. Esto permite
+reintentar envíos sin duplicar exámenes.
+
+**Resultados inmutables.** Una vez registrado, un resultado no se modifica. Las
+correcciones (en FHIR, `status = amended`) quedan fuera del alcance.
+
+**Interpretación con códigos HL7** (N normal, H alto, L bajo, A anormal), los
+mismos de `Observation.interpretation` en FHIR.
