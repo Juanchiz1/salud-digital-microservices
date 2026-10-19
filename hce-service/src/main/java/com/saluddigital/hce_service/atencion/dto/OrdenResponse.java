@@ -11,10 +11,14 @@ public record OrdenResponse(
         String examenCodigo,
         String examen,
         EstadoOrden estado,
-        OffsetDateTime creadaEn
+        OffsetDateTime creadaEn,
+        int intentosEnvio,
+        String ultimoError,
+        OffsetDateTime enviadaEn
 ) {
     public static OrdenResponse from(OrdenExamen o) {
         return new OrdenResponse(o.getId(), o.getExamen().getCodigo(), o.getExamen().getNombre(),
-                o.getEstado(), Fechas.local(o.getCreadaEn()));
+                o.getEstado(), Fechas.local(o.getCreadaEn()), o.getIntentosEnvio(),
+                o.getUltimoError(), Fechas.local(o.getEnviadaEn()));
     }
 }

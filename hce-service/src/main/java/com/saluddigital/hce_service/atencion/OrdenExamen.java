@@ -28,6 +28,13 @@ public class OrdenExamen {
     @Column(nullable = false, updatable = false)
     private Instant creadaEn;
 
+    @Column(nullable = false)
+    private int intentosEnvio;
+
+    private String ultimoError;
+    private Instant proximoIntento;
+    private Instant enviadaEn;
+
     protected OrdenExamen() {
     }
 
@@ -42,9 +49,28 @@ public class OrdenExamen {
         this.creadaEn = Instant.now();
     }
 
+        public void marcarEnviada() {
+        this.estado = EstadoOrden.ENVIADA;
+        this.enviadaEn = Instant.now();
+        this.ultimoError = null;
+        this.proximoIntento = null;
+    }
+
+    public void registrarFallo(String error) {
+        this.intentosEnvio++;
+        String mensaje = error == null ? "Error desconocido" : error;
+        this.ultimoError = mensaje.length() > 500 ? mensaje.substring(0, 500) : mensaje;
+        long espera = Math.min(10L << Math.min(intentosEnvio - 1, 5), 300);
+        this.proximoIntento = Instant.now().plusSeconds(espera);
+    }
+
     public UUID getId() { return id; }
     public Atencion getAtencion() { return atencion; }
     public Examen getExamen() { return examen; }
     public EstadoOrden getEstado() { return estado; }
     public Instant getCreadaEn() { return creadaEn; }
+        public int getIntentosEnvio() { return intentosEnvio; }
+    public String getUltimoError() { return ultimoError; }
+    public Instant getProximoIntento() { return proximoIntento; }
+    public Instant getEnviadaEn() { return enviadaEn; }
 }
