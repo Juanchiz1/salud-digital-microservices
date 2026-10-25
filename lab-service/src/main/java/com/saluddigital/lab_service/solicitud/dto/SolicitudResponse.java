@@ -19,6 +19,9 @@ public record SolicitudResponse(
         String conclusion,
         OffsetDateTime recibidaEn,
         OffsetDateTime resultadoEn,
+        OffsetDateTime notificadaEn,
+        int intentosNotificacion,
+        String ultimoError,
         List<ResultadoItemResponse> items
 ) {
     public static SolicitudResponse from(Solicitud s) {
@@ -26,6 +29,7 @@ public record SolicitudResponse(
                 s.getNumeroDocumento(), s.getPacienteNombre(), s.getExamenCodigo(),
                 s.getExamenNombre(), s.getEstado(), s.getConclusion(),
                 Fechas.local(s.getRecibidaEn()), Fechas.local(s.getResultadoEn()),
+                Fechas.local(s.getNotificadaEn()), s.getIntentosNotificacion(), s.getUltimoError(),
                 s.getItems().stream().map(ResultadoItemResponse::from).toList());
     }
 }

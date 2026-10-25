@@ -7,13 +7,12 @@ import com.saluddigital.lab_service.solicitud.dto.SolicitudRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.hl7.fhir.r4.model.ServiceRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -23,13 +22,15 @@ public class FhirController {
     private final FhirContext fhir;
     private final ServiceRequestMapper mapper;
     private final SolicitudService service;
+    private final NotificacionResultadoService notificacion;
     private final Validator validator;
 
-    public FhirController(FhirContext fhir, ServiceRequestMapper mapper,
-                          SolicitudService service, Validator validator) {
+    public FhirController(FhirContext fhir, ServiceRequestMapper mapper, SolicitudService service,
+                          NotificacionResultadoService notificacion, Validator validator) {
         this.fhir = fhir;
         this.mapper = mapper;
         this.service = service;
+        this.notificacion = notificacion;
         this.validator = validator;
     }
 
@@ -50,5 +51,12 @@ public class FhirController {
         return r.nueva()
                 ? ResponseEntity.created(ubicacion).build()
                 : ResponseEntity.ok().location(ubicacion).build();
+    }
+
+    @GetMapping("/DiagnosticReport/{id}")
+    public ResponseEntity<String> diagnosticReport(@PathVariable UUID id) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/fhir+json"))
+                .body(notificacion.verDiagnosticReport(id));
     }
 }

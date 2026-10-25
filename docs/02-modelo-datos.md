@@ -63,6 +63,7 @@ erDiagram
     PACIENTE ||--o{ ATENCION : recibe
     ATENCION ||--o{ ORDEN_EXAMEN : ordena
     EXAMEN ||--o{ ORDEN_EXAMEN : "se solicita en"
+    
 ```
 
 ## Decisiones

@@ -4,6 +4,9 @@ import com.saluddigital.hce_service.examen.Examen;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
+import com.saluddigital.hce_service.common.ConflictoException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "orden_examen")
@@ -34,6 +37,13 @@ public class OrdenExamen {
     private String ultimoError;
     private Instant proximoIntento;
     private Instant enviadaEn;
+    private String conclusion;
+    private Instant resultadoEmitidoEn;
+    private Instant resultadoRecibidoEn;
+
+    @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL)
+    @OrderBy("posicion")
+    private List<ResultadoValor> valores = new ArrayList<>();
 
     protected OrdenExamen() {
     }
@@ -64,6 +74,28 @@ public class OrdenExamen {
         this.proximoIntento = Instant.now().plusSeconds(espera);
     }
 
+        public void agregarValor(String analito, String valor, String unidad,
+                             String rangoReferencia, Interpretacion interpretacion) {
+        validarSinResultado();
+        valores.add(new ResultadoValor(this, valores.size() + 1, analito, valor,
+                unidad, rangoReferencia, interpretacion));
+    }
+
+    public void completar(String conclusion, Instant emitidoEn) {
+        validarSinResultado();
+        this.conclusion = conclusion;
+        this.resultadoEmitidoEn = emitidoEn;
+        this.resultadoRecibidoEn = Instant.now();
+        this.estado = EstadoOrden.COMPLETADA;
+        this.proximoIntento = null;
+    }
+
+    private void validarSinResultado() {
+        if (estado == EstadoOrden.COMPLETADA) {
+            throw new ConflictoException("La orden ya tiene resultado");
+        }
+    }
+
     public UUID getId() { return id; }
     public Atencion getAtencion() { return atencion; }
     public Examen getExamen() { return examen; }
@@ -73,4 +105,8 @@ public class OrdenExamen {
     public String getUltimoError() { return ultimoError; }
     public Instant getProximoIntento() { return proximoIntento; }
     public Instant getEnviadaEn() { return enviadaEn; }
+        public String getConclusion() { return conclusion; }
+    public Instant getResultadoEmitidoEn() { return resultadoEmitidoEn; }
+    public Instant getResultadoRecibidoEn() { return resultadoRecibidoEn; }
+    public List<ResultadoValor> getValores() { return valores; }
 }

@@ -24,4 +24,7 @@ public interface OrdenExamenRepository extends JpaRepository<OrdenExamen, UUID> 
 
     @EntityGraph(attributePaths = {"examen", "atencion", "atencion.paciente"})
     Optional<OrdenExamen> findParaEnvioById(UUID id);
+
+    @EntityGraph(attributePaths = {"examen", "valores", "atencion", "atencion.paciente"})
+    Optional<OrdenExamen> findResultadoById(UUID id);
 }

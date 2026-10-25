@@ -45,3 +45,36 @@ el envío de las demás órdenes indefinidamente.
 
 **Errores.** Laboratorio responde los errores como Problem Details (RFC 9457)
 y no como `OperationOutcome` de FHIR. Es una simplificación del alcance.
+
+## Retorno de resultados
+
+```mermaid
+sequenceDiagram
+    participant B as Bacteriólogo
+    participant L as lab-service
+    participant J as Job de notificación (Lab)
+    participant H as hce-service
+    participant M as Médico
+
+    B->>L: POST /api/solicitudes/{id}/resultado
+    L-->>B: 200, RESULTADO_LISTO
+    loop cada 10 s
+        J->>L: resultados sin notificar
+        J->>H: POST /fhir/DiagnosticReport
+        alt HCE responde 2xx
+            H-->>J: 201 Created / 200 OK (ya estaba)
+            J->>L: notificada_en = ahora
+        else error o sin respuesta
+            J->>L: intentos + 1, backoff
+        end
+    end
+    M->>H: GET /api/ordenes/{id}/resultado
+```
+
+**El resultado puede llegar antes que la confirmación del envío.** Si la
+respuesta de laboratorio a un ServiceRequest se perdió, la orden sigue en
+CREADA en la HCE aunque laboratorio ya la procesó. La HCE acepta el
+resultado igual y pasa la orden directo a COMPLETADA.
+
+**Recepción idempotente en la HCE.** Si llega un resultado para una orden
+ya COMPLETADA, responde 200 sin modificar nada.

@@ -51,6 +51,13 @@ public class Solicitud {
 
     private Instant resultadoEn;
 
+    @Column(nullable = false)
+    private int intentosNotificacion;
+
+    private String ultimoError;
+    private Instant proximoIntento;
+    private Instant notificadaEn;
+
     @OneToMany(mappedBy = "solicitud", cascade = CascadeType.ALL)
     @OrderBy("posicion")
     private List<ResultadoItem> items = new ArrayList<>();
@@ -97,6 +104,20 @@ public class Solicitud {
         }
     }
 
+    public void marcarNotificada() {
+        this.notificadaEn = Instant.now();
+        this.ultimoError = null;
+        this.proximoIntento = null;
+    }
+
+    public void registrarFalloNotificacion(String error) {
+        this.intentosNotificacion++;
+        String mensaje = error == null ? "Error desconocido" : error;
+        this.ultimoError = mensaje.length() > 500 ? mensaje.substring(0, 500) : mensaje;
+        long espera = Math.min(10L << Math.min(intentosNotificacion - 1, 5), 300);
+        this.proximoIntento = Instant.now().plusSeconds(espera);
+    }
+
     public UUID getId() { return id; }
     public UUID getOrdenExternaId() { return ordenExternaId; }
     public String getTipoDocumento() { return tipoDocumento; }
@@ -111,4 +132,8 @@ public class Solicitud {
     public Instant getRecibidaEn() { return recibidaEn; }
     public Instant getResultadoEn() { return resultadoEn; }
     public List<ResultadoItem> getItems() { return items; }
+    public int getIntentosNotificacion() { return intentosNotificacion; }
+    public String getUltimoError() { return ultimoError; }
+    public Instant getProximoIntento() { return proximoIntento; }
+    public Instant getNotificadaEn() { return notificadaEn; }
 }
