@@ -25,3 +25,7 @@ laboratorio:
   url: ${LAB_URL:http://localhost:8081}
   envio:
     intervalo-ms: 10000        
+
+seguridad:
+  jwt:
+    secreto: ${JWT_SECRET}    

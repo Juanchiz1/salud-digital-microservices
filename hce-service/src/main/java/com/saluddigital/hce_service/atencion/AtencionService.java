@@ -13,6 +13,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import com.saluddigital.hce_service.common.AccesoDenegadoException;
+import com.saluddigital.hce_service.seguridad.UsuarioActual;
 
 @Service
 public class AtencionService {
@@ -20,17 +22,22 @@ public class AtencionService {
     private final AtencionRepository atenciones;
     private final CitaRepository citas;
     private final ExamenRepository examenes;
+    private final UsuarioActual usuario;
 
-    public AtencionService(AtencionRepository atenciones, CitaRepository citas, ExamenRepository examenes) {
+    public AtencionService(AtencionRepository atenciones, CitaRepository citas, ExamenRepository examenes, UsuarioActual usuario) {
         this.atenciones = atenciones;
         this.citas = citas;
         this.examenes = examenes;
+        this.usuario = usuario;
     }
 
     @Transactional
     public AtencionResponse registrar(AtencionRequest req) {
         Cita cita = citas.findById(req.citaId())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Cita no encontrada"));
+            if (!cita.getMedico().getId().equals(usuario.medicoId())) {
+            throw new AccesoDenegadoException("Solo el médico asignado a la cita puede registrar la atención");
+        }
         cita.atender();
 
         Atencion atencion = new Atencion(cita, req.motivoConsulta().trim(), req.notas(),
