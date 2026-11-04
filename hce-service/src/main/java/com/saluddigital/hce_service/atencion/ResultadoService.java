@@ -1,5 +1,7 @@
 package com.saluddigital.hce_service.atencion;
 
+import com.saluddigital.hce_service.acceso.AccesoClinicoService;
+import com.saluddigital.hce_service.acceso.RecursoAuditado;
 import com.saluddigital.hce_service.atencion.dto.ResultadoResponse;
 import com.saluddigital.hce_service.common.RecursoNoEncontradoException;
 import org.springframework.stereotype.Service;
@@ -10,9 +12,11 @@ import java.util.UUID;
 public class ResultadoService {
 
     private final OrdenExamenRepository ordenes;
+    private final AccesoClinicoService acceso;
 
-    public ResultadoService(OrdenExamenRepository ordenes) {
+    public ResultadoService(OrdenExamenRepository ordenes, AccesoClinicoService acceso) {
         this.ordenes = ordenes;
+        this.acceso = acceso;
     }
 
     @Transactional
@@ -31,6 +35,7 @@ public class ResultadoService {
     @Transactional(readOnly = true)
     public ResultadoResponse consultar(UUID ordenId) {
         OrdenExamen orden = obtener(ordenId);
+        acceso.verificar(orden.getAtencion().getPaciente().getId(), RecursoAuditado.RESULTADO, ordenId);
         if (orden.getEstado() != EstadoOrden.COMPLETADA) {
             throw new RecursoNoEncontradoException("La orden todavía no tiene resultado");
         }

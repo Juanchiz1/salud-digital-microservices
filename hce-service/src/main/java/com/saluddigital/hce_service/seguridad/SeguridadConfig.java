@@ -42,6 +42,11 @@ public class SeguridadConfig {
                         .requestMatchers("/api/atenciones", "/api/atenciones/**").hasRole("MEDICO")
                         .requestMatchers("/api/ordenes/**").hasRole("MEDICO")
 
+                        
+                        .requestMatchers(HttpMethod.POST, "/api/accesos-emergencia").hasRole("MEDICO")
+                        .requestMatchers("/api/auditoria", "/api/auditoria/**").hasRole("AUDITOR")
+                        .requestMatchers(HttpMethod.GET, "/api/indicadores").hasRole("GERENCIA")
+
                         .anyRequest().denyAll())
                 .oauth2ResourceServer(o -> o.jwt(j -> j.jwtAuthenticationConverter(jwtConverter)));
         return http.build();

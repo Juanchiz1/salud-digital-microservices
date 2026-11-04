@@ -15,4 +15,5 @@ public interface CitaRepository extends JpaRepository<Cita, UUID> {
 
     @EntityGraph(attributePaths = {"paciente", "medico"})
     List<Cita> findByMedicoIdAndEstadoOrderByFechaHoraAsc(UUID medicoId, EstadoCita estado);
+    boolean existsByPacienteIdAndMedicoIdAndEstadoNot(UUID pacienteId, UUID medicoId, EstadoCita estado);
 }

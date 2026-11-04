@@ -29,3 +29,6 @@ laboratorio:
 seguridad:
   jwt:
     secreto: ${JWT_SECRET}    
+
+indicadores:
+  umbral-minimo: ${INDICADORES_UMBRAL:5}    
