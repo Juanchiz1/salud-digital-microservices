@@ -31,4 +31,9 @@ seguridad:
     secreto: ${JWT_SECRET}    
 
 indicadores:
-  umbral-minimo: ${INDICADORES_UMBRAL:5}    
+  umbral-minimo: ${INDICADORES_UMBRAL:5}   
+
+integracion:
+  nombre: hce-service
+  par: lab-service
+  secreto: ${INTEGRACION_SECRET}   

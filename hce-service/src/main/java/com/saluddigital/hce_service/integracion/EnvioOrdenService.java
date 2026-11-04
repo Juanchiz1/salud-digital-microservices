@@ -1,6 +1,8 @@
 package com.saluddigital.hce_service.integracion;
 
 import ca.uhn.fhir.context.FhirContext;
+import com.saluddigital.hce_service.acceso.AccesoClinicoService;
+import com.saluddigital.hce_service.acceso.RecursoAuditado;
 import com.saluddigital.hce_service.atencion.EstadoOrden;
 import com.saluddigital.hce_service.atencion.OrdenExamen;
 import com.saluddigital.hce_service.atencion.OrdenExamenRepository;
@@ -24,13 +26,15 @@ public class EnvioOrdenService {
     private final ServiceRequestMapper mapper;
     private final FhirContext fhir;
     private final RestClient laboratorio;
+    private final AccesoClinicoService acceso;
 
-    public EnvioOrdenService(OrdenExamenRepository ordenes, ServiceRequestMapper mapper,
-                             FhirContext fhir, RestClient laboratorio) {
+    public EnvioOrdenService(OrdenExamenRepository ordenes, ServiceRequestMapper mapper, FhirContext fhir,
+                             RestClient laboratorio, AccesoClinicoService acceso) {
         this.ordenes = ordenes;
         this.mapper = mapper;
         this.fhir = fhir;
         this.laboratorio = laboratorio;
+        this.acceso = acceso;
     }
 
     @Transactional
@@ -58,8 +62,11 @@ public class EnvioOrdenService {
 
     @Transactional(readOnly = true)
     public String verServiceRequest(UUID ordenId) {
+        OrdenExamen orden = obtener(ordenId);
+        acceso.verificar(orden.getAtencion().getPaciente().getId(), RecursoAuditado.ATENCION,
+                orden.getAtencion().getId());
         return fhir.newJsonParser().setPrettyPrint(true)
-                .encodeResourceToString(mapper.aServiceRequest(obtener(ordenId)));
+                .encodeResourceToString(mapper.aServiceRequest(orden));
     }
 
     private OrdenExamen obtener(UUID ordenId) {

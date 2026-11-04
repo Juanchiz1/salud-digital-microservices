@@ -16,11 +16,18 @@ public class FhirConfig {
         return FhirContext.forR4();
     }
 
-    @Bean
-    public RestClient hceClient(@Value("${hce.url}") String url) {
+        @Bean
+    public RestClient hceClient(@Value("${hce.url}") String url, TokenServicio tokens) {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(Duration.ofSeconds(3));
         factory.setReadTimeout(Duration.ofSeconds(5));
-        return RestClient.builder().baseUrl(url).requestFactory(factory).build();
+        return RestClient.builder()
+                .baseUrl(url)
+                .requestFactory(factory)
+                .requestInterceptor((request, body, execution) -> {
+                    request.getHeaders().setBearerAuth(tokens.emitir());
+                    return execution.execute(request, body);
+                })
+                .build();
     }
 }

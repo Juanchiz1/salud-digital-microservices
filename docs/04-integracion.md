@@ -78,3 +78,22 @@ resultado igual y pasa la orden directo a COMPLETADA.
 
 **Recepción idempotente en la HCE.** Si llega un resultado para una orden
 ya COMPLETADA, responde 200 sin modificar nada.
+
+## Autenticación entre servicios
+
+Los endpoints `POST /fhir/**` de ambos servicios solo aceptan llamadas del
+otro servicio.
+
+- Antes de cada llamada, el servicio que llama genera un JWT (HS256) con
+  `iss` = su nombre, `aud` = el servicio destino, `scope = fhir` y una
+  vigencia de 2 minutos.
+- El destino valida firma, vigencia, emisor y audiencia. La HCE solo acepta
+  `iss = lab-service`, `aud = hce-service`, y el laboratorio al revés.
+- La clave (`INTEGRACION_SECRET`) es distinta de la de usuarios
+  (`JWT_SECRET`): un token de usuario no abre `/fhir/**`.
+- Si el destino rechaza el token (401), el envío cuenta como fallido y se
+  reintenta con el mismo backoff.
+
+Limitación: ambos servicios comparten una clave simétrica. En producción
+cada servicio tendría su propio par de claves (RS256), o se usaría mTLS u
+OAuth 2.0 client credentials con un servidor de autorización.

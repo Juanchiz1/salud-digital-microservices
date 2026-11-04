@@ -11,19 +11,35 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import com.saluddigital.hce_service.integracion.TokenServicio;
+import org.springframework.core.annotation.Order;
 
 @Configuration
 public class SeguridadConfig {
 
     @Bean
+    @Order(1)
+    SecurityFilterChain filtroIntegracion(HttpSecurity http, TokenServicio tokens) throws Exception {
+        http
+                .securityMatcher(req -> "POST".equals(req.getMethod()) && req.getRequestURI().startsWith("/fhir/"))
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth.anyRequest().hasAuthority("SCOPE_" + TokenServicio.ALCANCE))
+                .oauth2ResourceServer(o -> o.jwt(j -> j
+                        .decoder(tokens.decoder())
+                        .jwtAuthenticationConverter(new JwtAuthenticationConverter())));
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     SecurityFilterChain filtroSeguridad(HttpSecurity http, JwtAuthenticationConverter jwtConverter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/error", "/api/auth/login").permitAll()
-                        // Temporal: se protege con autenticación entre servicios en el paso 6c
-                        .requestMatchers("/fhir/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/fhir/ServiceRequest/*").hasRole("MEDICO")
 
                         .requestMatchers("/api/auth/yo").authenticated()
 

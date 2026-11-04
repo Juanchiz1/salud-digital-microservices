@@ -17,10 +17,17 @@ public class IntegracionConfig {
     }
 
     @Bean
-    public RestClient laboratorioClient(@Value("${laboratorio.url}") String url) {
+    public RestClient laboratorioClient(@Value("${laboratorio.url}") String url, TokenServicio tokens) {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(Duration.ofSeconds(3));
         factory.setReadTimeout(Duration.ofSeconds(5));
-        return RestClient.builder().baseUrl(url).requestFactory(factory).build();
+        return RestClient.builder()
+                .baseUrl(url)
+                .requestFactory(factory)
+                .requestInterceptor((request, body, execution) -> {
+                    request.getHeaders().setBearerAuth(tokens.emitir());
+                    return execution.execute(request, body);
+                })
+                .build();
     }
 }

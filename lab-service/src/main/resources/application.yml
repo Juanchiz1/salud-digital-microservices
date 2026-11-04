@@ -23,4 +23,8 @@ management:
 hce:
   url: ${HCE_URL:http://localhost:8080}
   notificacion:
-    intervalo-ms: 10000        
+    intervalo-ms: 10000    
+integracion:
+  nombre: lab-service
+  par: hce-service
+  secreto: ${INTEGRACION_SECRET}    
