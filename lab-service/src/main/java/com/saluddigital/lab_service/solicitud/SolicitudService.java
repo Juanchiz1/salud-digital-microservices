@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
+import com.saluddigital.lab_service.seguridad.UsuarioActual;
 
 @Service
 public class SolicitudService {
@@ -17,11 +18,12 @@ public class SolicitudService {
     }
 
     private final SolicitudRepository repository;
+    private final UsuarioActual usuario;
 
-    public SolicitudService(SolicitudRepository repository) {
+    public SolicitudService(SolicitudRepository repository, UsuarioActual usuario) {
         this.repository = repository;
+        this.usuario = usuario;
     }
-
     @Transactional
     public Recepcion recibir(SolicitudRequest req) {
         return repository.findByOrdenExternaId(req.ordenExternaId())
@@ -52,7 +54,7 @@ public class SolicitudService {
             solicitud.agregarItem(item.analito().trim(), item.valor().trim(), item.unidad(),
                     item.rangoReferencia(), item.interpretacion());
         }
-        solicitud.registrarResultado(req.conclusion());
+    solicitud.registrarResultado(req.conclusion(), usuario.username());
         return SolicitudResponse.from(solicitud);
     }
 

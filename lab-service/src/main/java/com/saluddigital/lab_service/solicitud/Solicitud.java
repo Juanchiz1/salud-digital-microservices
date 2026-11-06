@@ -50,6 +50,7 @@ public class Solicitud {
     private Instant recibidaEn;
 
     private Instant resultadoEn;
+    private String registradoPor;
 
     @Column(nullable = false)
     private int intentosNotificacion;
@@ -91,9 +92,10 @@ public class Solicitud {
                 unidad, rangoReferencia, interpretacion));
     }
 
-    public void registrarResultado(String conclusion) {
+    public void registrarResultado(String conclusion, String usuario) {
         validarAbierta();
         this.conclusion = conclusion;
+        this.registradoPor = usuario;
         this.estado = EstadoSolicitud.RESULTADO_LISTO;
         this.resultadoEn = Instant.now();
     }
@@ -136,4 +138,6 @@ public class Solicitud {
     public String getUltimoError() { return ultimoError; }
     public Instant getProximoIntento() { return proximoIntento; }
     public Instant getNotificadaEn() { return notificadaEn; }
+
+    public String getRegistradoPor() { return registradoPor; }
 }

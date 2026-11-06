@@ -27,4 +27,8 @@ hce:
 integracion:
   nombre: lab-service
   par: hce-service
-  secreto: ${INTEGRACION_SECRET}    
+  secreto: ${INTEGRACION_SECRET}   
+
+seguridad:
+  jwt:
+    secreto: ${LAB_JWT_SECRET}   
