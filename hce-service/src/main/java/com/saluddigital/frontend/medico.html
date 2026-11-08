@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SaludDigital · Médico</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/componentes.css">
+</head>
+<body>
+  <header class="barra">
+    <span class="barra__marca">SaludDigital</span>
+    <span class="barra__usuario"><span id="usuario-nombre"></span> · <span id="usuario-rol"></span></span>
+    <button id="salir" class="boton boton--texto" type="button">Salir</button>
+  </header>
+
+  <main class="contenido contenido--dos">
+    <aside class="panel">
+      <h2>Mi agenda</h2>
+      <div id="agenda"></div>
+
+      <h3>Buscar paciente</h3>
+      <form id="form-buscar" class="formulario">
+        <label class="campo"><span>Tipo</span>
+          <select name="tipoDocumento">
+            <option>CC</option><option>TI</option><option>CE</option>
+            <option>RC</option><option>PA</option><option>PT</option>
+          </select>
+        </label>
+        <label class="campo"><span>Número de documento</span>
+          <input name="numeroDocumento" required maxlength="20" pattern="[A-Za-z0-9]+">
+        </label>
+        <button class="boton boton--primario" type="submit">Buscar</button>
+      </form>
+      <p id="buscar-msg" class="mensaje" hidden></p>
+    </aside>
+
+    <section id="panel-paciente" class="panel" hidden>
+      <div class="panel__cabecera">
+        <h2 id="paciente-nombre"></h2>
+        <span id="paciente-doc" class="etiqueta"></span>
+      </div>
+      <p id="paciente-datos" class="detalle"></p>
+
+      <div id="bloque-emergencia" hidden>
+        <h3>Acceso de emergencia</h3>
+        <p class="detalle">Úselo solo en una urgencia real. Dura 4 horas y lo revisa el oficial de privacidad.</p>
+        <form id="form-emergencia" class="formulario">
+          <label class="campo"><span>Justificación (mínimo 20 caracteres)</span>
+            <textarea name="justificacion" required minlength="20" maxlength="500"></textarea>
+          </label>
+          <button class="boton boton--aviso" type="submit">Activar acceso de emergencia</button>
+        </form>
+        <p id="emergencia-msg" class="mensaje" hidden></p>
+      </div>
+
+      <div id="bloque-atencion" hidden>
+        <h3>Registrar atención</h3>
+        <p id="atencion-cita" class="detalle"></p>
+        <form id="form-atencion" class="rejilla-form">
+          <label class="campo campo--completo"><span>Motivo de consulta</span>
+            <textarea name="motivoConsulta" required maxlength="500"></textarea>
+          </label>
+          <label class="campo"><span>Diagnóstico CIE-10</span>
+            <input name="diagnosticoCodigo" required maxlength="4" pattern="[A-Za-z][0-9]{2}[0-9Xx]" placeholder="R51X">
+          </label>
+          <label class="campo"><span>Descripción del diagnóstico</span>
+            <input name="diagnosticoDescripcion" required maxlength="255">
+          </label>
+          <label class="campo campo--completo"><span>Notas</span>
+            <textarea name="notas" maxlength="2000"></textarea>
+          </label>
+          <fieldset>
+            <legend>Exámenes de laboratorio</legend>
+            <div id="lista-examenes"></div>
+          </fieldset>
+          <button class="boton boton--primario" type="submit">Guardar atención</button>
+        </form>
+        <p id="atencion-msg" class="mensaje" hidden></p>
+      </div>
+
+      <div class="panel__cabecera">
+        <h3>Historia clínica</h3>
+        <button id="actualizar" class="boton boton--texto" type="button">Actualizar</button>
+      </div>
+      <div id="historia"></div>
+      <div id="resultado" class="resultado" hidden></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/medico.js"></script>
+</body>
+</html>

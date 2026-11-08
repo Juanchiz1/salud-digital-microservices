@@ -13,6 +13,12 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 import com.saluddigital.hce_service.integracion.TokenServicio;
 import org.springframework.core.annotation.Order;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.config.Customizer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.List;
 
 @Configuration
 public class SeguridadConfig {
@@ -34,7 +40,9 @@ public class SeguridadConfig {
     @Bean
     @Order(2)
     SecurityFilterChain filtroSeguridad(HttpSecurity http, JwtAuthenticationConverter jwtConverter) throws Exception {
-        http
+               http
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -82,5 +90,18 @@ public class SeguridadConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource(@Value("${cors.origenes}") List<String> origenes) {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(origenes);
+        config.setAllowedMethods(List.of("GET", "POST", "PATCH"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/**", config);
+        return source;
     }
 }

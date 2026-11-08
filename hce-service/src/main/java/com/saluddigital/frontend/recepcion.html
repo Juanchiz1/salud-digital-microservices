@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SaludDigital · Recepción</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/componentes.css">
+</head>
+<body>
+  <header class="barra">
+    <span class="barra__marca">SaludDigital</span>
+    <span class="barra__usuario"><span id="usuario-nombre"></span> · <span id="usuario-rol"></span></span>
+    <button id="salir" class="boton boton--texto" type="button">Salir</button>
+  </header>
+
+  <main class="contenido">
+    <section class="panel">
+      <h2>Buscar paciente</h2>
+      <form id="form-buscar" class="fila-form">
+        <label class="campo campo--corto"><span>Tipo</span>
+          <select name="tipoDocumento">
+            <option>CC</option><option>TI</option><option>CE</option>
+            <option>RC</option><option>PA</option><option>PT</option>
+          </select>
+        </label>
+        <label class="campo"><span>Número de documento</span>
+          <input name="numeroDocumento" required maxlength="20" pattern="[A-Za-z0-9]+">
+        </label>
+        <button class="boton boton--primario" type="submit">Buscar</button>
+      </form>
+      <p id="buscar-msg" class="mensaje" hidden></p>
+    </section>
+
+    <section id="panel-registro" class="panel" hidden>
+      <h2>Registrar paciente <span id="registro-doc" class="etiqueta"></span></h2>
+      <form id="form-registro" class="rejilla-form">
+        <label class="campo"><span>Nombres</span><input name="nombres" required maxlength="100"></label>
+        <label class="campo"><span>Apellidos</span><input name="apellidos" required maxlength="100"></label>
+        <label class="campo"><span>Fecha de nacimiento</span><input name="fechaNacimiento" type="date" required></label>
+        <label class="campo"><span>Sexo</span>
+          <select name="sexo" required>
+            <option value="M">Mujer</option>
+            <option value="H">Hombre</option>
+            <option value="I">Indeterminado</option>
+          </select>
+        </label>
+        <label class="campo"><span>Teléfono</span><input name="telefono" maxlength="20"></label>
+        <label class="campo"><span>Correo</span><input name="email" type="email" maxlength="120"></label>
+        <button class="boton boton--primario" type="submit">Registrar</button>
+      </form>
+      <p id="registro-msg" class="mensaje" hidden></p>
+    </section>
+
+    <section id="panel-paciente" class="panel" hidden>
+      <div class="panel__cabecera">
+        <h2 id="paciente-nombre"></h2>
+        <span id="paciente-doc" class="etiqueta"></span>
+      </div>
+
+      <h3>Agendar cita</h3>
+      <form id="form-cita" class="rejilla-form">
+        <label class="campo"><span>Médico</span><select id="select-medico" name="medicoId" required></select></label>
+        <label class="campo"><span>Fecha y hora</span><input name="fechaHora" type="datetime-local" required></label>
+        <label class="campo campo--completo"><span>Motivo</span><input name="motivo" required maxlength="255"></label>
+        <button class="boton boton--primario" type="submit">Agendar</button>
+      </form>
+      <p id="cita-msg" class="mensaje" hidden></p>
+
+      <h3>Citas del paciente</h3>
+      <div id="lista-citas"></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/recepcion.js"></script>
+</body>
+</html>

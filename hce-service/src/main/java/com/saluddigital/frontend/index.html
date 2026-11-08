@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SaludDigital · Ingreso</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/componentes.css">
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body class="pagina-login">
+  <main class="login">
+    <h1 class="login__marca">SaludDigital</h1>
+    <p class="login__sub">Historia clínica integrada</p>
+    <form id="form-login" class="formulario">
+      <label class="campo"><span>Usuario</span>
+        <input name="username" autocomplete="username" required>
+      </label>
+      <label class="campo"><span>Contraseña</span>
+        <input name="password" type="password" autocomplete="current-password" required>
+      </label>
+      <p id="login-error" class="mensaje" hidden></p>
+      <button class="boton boton--primario" type="submit">Ingresar</button>
+    </form>
+    <p class="login__nota">Sistema de demostración con datos ficticios.</p>
+  </main>
+  <script type="module" src="js/login.js"></script>
+</body>
+</html>
